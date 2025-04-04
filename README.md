@@ -17,7 +17,7 @@ DocGenius AI is an AI-powered document understanding system that allows users to
 
 Below is an overview of the system's architecture:  
 
-![Architecture Diagram](./docs/architecture.png)  
+![Architecture Diagram](./docs/image.png)  
 
 
 
