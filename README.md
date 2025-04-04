@@ -2,9 +2,6 @@
 
 DocGenius AI is an AI-powered document understanding system that allows users to upload documents and ask questions in natural language. The system processes documents, generates embeddings, and retrieves context-aware responses using advanced AI models.
 
-## Flow Diagram
-
-![Image](https://github.com/user-attachments/assets/c6e0e958-5825-42f8-9490-ff35536fc2e2)
 ---
 
 ## 📌 Features
@@ -20,9 +17,7 @@ DocGenius AI is an AI-powered document understanding system that allows users to
 
 Below is an overview of the system's architecture:  
 
-![Architecture Diagram](./docs/image.png)  
-
-
+![Image](https://github.com/user-attachments/assets/c6e0e958-5825-42f8-9490-ff35536fc2e2)
 
 ---
 
