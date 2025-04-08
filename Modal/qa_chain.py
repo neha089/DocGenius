@@ -1,9 +1,12 @@
+# qa_chain.py
 import os
 from langchain_community.document_loaders import PyMuPDFLoader
 from langchain_community.vectorstores import FAISS
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.llms import CTransformers
+from dotenv import load_dotenv
+from typing import Optional
+from transformers import pipeline
 
 UPLOAD_DIR = "uploads/"
 VECTOR_DIR = "vectorstore/"
@@ -11,12 +14,8 @@ VECTOR_DIR = "vectorstore/"
 # Use free HuggingFace embedding model
 embedding_model = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 
-# Load LLaMA model using ctransformers
-llm = CTransformers(
-    model="D:/TalkEase/TalkEase/model/saved_model/llama-2-7b-chat.Q4_K_M.gguf",  # ⬅️ Update this path
-    model_type="llama",
-    config={"max_new_tokens": 512, "temperature": 0.7}
-)
+# QA pipeline using HuggingFace transformers (DistilBERT)
+qa_pipeline = pipeline("question-answering", model="distilbert-base-cased-distilled-squad")
 
 def process_and_save_doc(file_path):
     loader = PyMuPDFLoader(file_path)
@@ -36,25 +35,15 @@ def ask_question(query: str):
     retriever = load_retriever()
     relevant_docs = retriever.get_relevant_documents(query)
 
-    print("\n🔍 Top Relevant Chunks:")
-    for idx, doc in enumerate(relevant_docs):
-        print(f"\n--- Chunk {idx+1} ---")
-        print(doc.page_content[:300])
-        print("Metadata:", doc.metadata)
-
-    # Prepare full context
+    # Concatenate all context chunks for the QA pipeline
     context = "\n".join([doc.page_content for doc in relevant_docs])
-    context = context[:2000]  # LLaMA context limit
+    
+    # Limit context to 1000 tokens (for smaller models)
+    context = context[:1000]
 
-    print("\n📄 Final Context Sent to LLaMA:")
-    print(context)
+    result = qa_pipeline({
+        'context': context,
+        'question': query
+    })
 
-    # Format prompt for LLaMA
-    prompt = f"""### Context:\n{context}\n\n### Question:\n{query}\n\n### Answer:"""
-
-    response = llm(prompt)
-    return {
-        "answer": response.strip(),
-        "context": context,
-        "chunks_used": len(relevant_docs)
-    }
+    return result['answer']
